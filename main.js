@@ -1,16 +1,22 @@
-const width = 1200
-const height = 700
+const width = 1100
+const height = 600
 const margin = {top: 10, bottom: 40, left: 40, right: 10}
 const netWidth = width - margin.left - margin.right
 const netHeight = height - margin.bottom - margin.top
 
-// Create chart groups and title
+// Create chart groups
 const svg = d3.select("div#chart").append("svg").attr("width", width).attr("height", height)
 const elementGroup = svg.append("g").attr("id", "elementGroup").attr("transform", `translate(${margin.left}, ${margin.top})`)
 const datesGroup = elementGroup.append("g").attr("id", "datesGroup")
+const mouseLinesGroup = elementGroup.append("g").attr("id", "mouseLinesGroup")
 const axisGroup = svg.append("g").attr("id", "axisGroup")
 const xAxisGroup = axisGroup.append("g").attr("id", "xAxisGroup").attr("transform", `translate(${margin.left}, ${height - margin.bottom})`)
 const yAxisGroup = axisGroup.append("g").attr("id", "yAxisGroup").attr("transform", `translate(${margin.left}, ${margin.top})`)
+
+// Title
+const title = "IBEX 35"
+d3.select("title").text(title)
+svg.append("text").attr("id", "title").attr("x", width - 20).attr("y", height - 80).text(title).lower()   
 
 // Add axis
 const x = d3.scaleTime().range([0, netWidth])
@@ -39,7 +45,7 @@ function showData(data) {
     x.domain(d3.extent(data, d => d.date))
     const minLow = d3.min(data, d => d.low)
     const maxHigh = d3.max(data, d => d.high)
-    y.domain([minLow, maxHigh])
+    y.domain([minLow - 200, maxHigh])
     z.domain(d3.extent(data, d => d.volume))
 
     xAxisGroup.call(xAxis.tickFormat(d3.timeFormat("%b %Y")))    
@@ -47,54 +53,83 @@ function showData(data) {
 
     // Show mouse lines, candlesticks and volume bars
     const candleWidth = 0.45 * netWidth / data.length     
+    showMouseLines()
     showCandles(data, candleWidth)
     showVolume(data, candleWidth) 
 }
 
 function showCandles(data, candleWidth) {
     const timeFormat = d3.timeFormat("%d-%m-%Y")
-    
     datesGroup.selectAll("g")
         .data(data)
         .enter().append("g")
         .attr("id", d => timeFormat(d.date))
-
+    
     datesGroup.selectAll("g").append("rect")
         .attr("x", d => x(d.date) - 1.25 * candleWidth / 2)
         .attr("y", 0)
         .attr("width", 1.25 * candleWidth)
         .attr("height", height)
-        .attr("fill", "black")
+        // .attr("fill", "black")
         .attr("opacity", 0) 
-    
+        
     const candleGroups = datesGroup.selectAll("g").append("g").attr("class", "candle")
     // Candlestick wiskers
     candleGroups.append("line")
-        .attr("stroke", d => d.open > d.close ? "red" : "green")
-        .attr("stroke-width", 0.35)
+        .attr("class", d => d.open > d.close ? "redLine" : "greenLine")
         .attr("x1", d => x(d.date))
         .attr("y1", d => y(d.high))
         .attr("x2", d => x(d.date))
         .attr("y2", d => y(d.low))
-    
+        
     // Candlestick bodies
     candleGroups.append("rect")
-        .attr("fill", d => d.open > d.close ? "#ff4141" : "#69ff69")
-        .attr("stroke", d => d.open > d.close ? "red" : "green")
-        .attr("stroke-width", 0.5)
+        .attr("class", d => d.open > d.close ? "redCandle" : "greenCandle")
         .attr("x", d => x(d.date) - candleWidth / 2)
         .attr("y", d => y(Math.max(d.open, d.close)))
-        .attr("width", () => candleWidth)
-        .attr("height", d => Math.abs(y(d.open) - y(d.close)))    
+        .attr("width", candleWidth)
+        .attr("height", d => Math.abs(y(d.open) - y(d.close)))
 }
-
+    
 function showVolume(data, candleWidth) {
     const volumeGroups = datesGroup.selectAll("g").append("g").attr("class", "volumeBar")
     volumeGroups.append("rect")
         .attr("class", d => d.open > d.close ? "redBar" : "greenBar")
         .attr("x", d => x(d.date) - candleWidth / 2)
         .attr("y", d => z(d.volume))
-        .attr("width", () => candleWidth)
+        .attr("width", candleWidth)
         .attr("height", d => netHeight- z(d.volume))
+}
+
+function showMouseLines() {
+    // Horizontal line
+    mouseLinesGroup.append("line")
+        .attr("id", "hMouseLine")
+        .attr("class", "mouseLine")
+        .attr("x1", 0)
+        .attr("x2", width)
+    
+    // Vertical line
+    mouseLinesGroup.append("line")
+        .attr("id", "vMouseLine")
+        .attr("class", "mouseLine")
+        .attr("y1", 0)
+        .attr("y2", height)  
+    
+    svg.on("mouseenter", () => mouseLinesGroup.style("display", "block"))
+        .on("mousemove", () => moveMouseLines(d3.event.clientX, d3.event.clientY))
+        .on("mouseleave", () => mouseLinesGroup.style("display", "none"))
+}
+
+function moveMouseLines(x, y) {
+    const mouseOffsetY = 8
+    const verticalMargins = margin.top + mouseOffsetY 
+    const hMouseLine = d3.select("line#hMouseLine")
+    hMouseLine.attr("y1", y - verticalMargins).attr("y2", y - verticalMargins).style("display", "block")
+    
+    const mouseOffsetX = 8
+    const horizontalMargins = margin.left + mouseOffsetX 
+    const vMouseLine = d3.select("line#vMouseLine")
+    vMouseLine.attr("x1", x - horizontalMargins).attr("x2", x - horizontalMargins).style("display", "block")
 }
 

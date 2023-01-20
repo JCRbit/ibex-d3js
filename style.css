@@ -1,9 +1,43 @@
+html {
+    background-color: #181a1b;
+    color: #e8e6e3;
+}
+
 body {
     background-color: #181a1b;
 }
 
+#title {
+    text-anchor: end;
+    fill: #383838;  
+    font-size: 100px; 
+    opacity: 0.5;  
+}
+
 #axisGroup {
     color: #e8e6e3;
+}
+
+.greenLine {
+    stroke: green;
+    stroke-width: 0.35;
+}
+
+.redLine {
+    stroke: red; 
+    stroke-width: 0.35;
+}
+
+.greenCandle {
+    fill: #69ff69;
+    stroke: green;
+    stroke-width: 0.5;
+}
+
+.redCandle {
+    fill: #ff4141;
+    stroke: red; 
+    stroke-width: 0.5;
 }
 
 .volumeBar {
@@ -23,15 +57,14 @@ body {
     stroke: red;
 } */
 
-.green {
-    color: #69ff69;
-}
-
-.red {
-    color: #ff4141;
-}
-
 .tick line {
     stroke:  rgba(255, 255, 255, 0.5);
     stroke-width: 0.3px;
+}
+
+.mouseLine {
+    stroke: white;
+    stroke-width: 0.2px;
+    stroke-dasharray: 4, 2;
+    display: none;
 }
