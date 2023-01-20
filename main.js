@@ -14,7 +14,8 @@ const yAxisGroup = axisGroup.append("g").attr("id", "yAxisGroup").attr("transfor
 
 // Add axis
 const x = d3.scaleTime().range([0, netWidth])
-const y = d3.scaleLinear().range([netHeight, 0])
+const y = d3.scaleLinear().range([netHeight, 0]) // Price
+const z = d3.scaleLinear().range([netHeight, netHeight * 0.85]) // Volume 
 
 const xAxis = d3.axisBottom().scale(x)
 const yAxis = d3.axisLeft().scale(y)
@@ -39,13 +40,15 @@ function showData(data) {
     const minLow = d3.min(data, d => d.low)
     const maxHigh = d3.max(data, d => d.high)
     y.domain([minLow, maxHigh])
+    z.domain(d3.extent(data, d => d.volume))
 
-    xAxisGroup.call(xAxis)    
-    yAxisGroup.call(yAxis)
+    xAxisGroup.call(xAxis.tickFormat(d3.timeFormat("%b %Y")))    
+    yAxisGroup.call(yAxis.tickSizeInner(-netWidth))
 
     // Show mouse lines, candlesticks and volume bars
     const candleWidth = 0.45 * netWidth / data.length     
     showCandles(data, candleWidth)
+    showVolume(data, candleWidth) 
 }
 
 function showCandles(data, candleWidth) {
@@ -57,9 +60,9 @@ function showCandles(data, candleWidth) {
         .attr("id", d => timeFormat(d.date))
 
     datesGroup.selectAll("g").append("rect")
-        .attr("x", d => x(d.date) - 1.5 * candleWidth / 2)
+        .attr("x", d => x(d.date) - 1.25 * candleWidth / 2)
         .attr("y", 0)
-        .attr("width", 1.5 * candleWidth)
+        .attr("width", 1.25 * candleWidth)
         .attr("height", height)
         .attr("fill", "black")
         .attr("opacity", 0) 
@@ -85,4 +88,13 @@ function showCandles(data, candleWidth) {
         .attr("height", d => Math.abs(y(d.open) - y(d.close)))    
 }
 
+function showVolume(data, candleWidth) {
+    const volumeGroups = datesGroup.selectAll("g").append("g").attr("class", "volumeBar")
+    volumeGroups.append("rect")
+        .attr("class", d => d.open > d.close ? "redBar" : "greenBar")
+        .attr("x", d => x(d.date) - candleWidth / 2)
+        .attr("y", d => z(d.volume))
+        .attr("width", () => candleWidth)
+        .attr("height", d => netHeight- z(d.volume))
+}
 

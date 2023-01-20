@@ -5,3 +5,33 @@ body {
 #axisGroup {
     color: #e8e6e3;
 }
+
+.volumeBar {
+    fill: gray;
+    stroke: white;
+    stroke-width: 0.1px;
+    opacity: 0.25;
+}
+
+/* .greenBar {
+    fill: #69ff69;
+    stroke: green;
+}
+
+.redBar {
+    fill: #ff4141;
+    stroke: red;
+} */
+
+.green {
+    color: #69ff69;
+}
+
+.red {
+    color: #ff4141;
+}
+
+.tick line {
+    stroke:  rgba(255, 255, 255, 0.5);
+    stroke-width: 0.3px;
+}
