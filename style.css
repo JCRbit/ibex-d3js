@@ -43,7 +43,7 @@ body {
 .volumeBar {
     fill: gray;
     stroke: white;
-    stroke-width: 0.1px;
+    stroke-width: 0.25;
     opacity: 0.25;
 }
 
@@ -64,7 +64,6 @@ body {
 
 .mouseLine {
     stroke: white;
-    stroke-width: 0.2px;
+    stroke-width: 0.2;
     stroke-dasharray: 4, 2;
-    display: none;
 }
