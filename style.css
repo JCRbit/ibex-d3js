@@ -5,6 +5,7 @@ html {
 
 body {
     background-color: #181a1b;
+    /* background-color: white; */
 }
 
 #title {
@@ -57,9 +58,33 @@ body {
     stroke: red;
 } */
 
+.greenText {
+    color: #69ff69;
+}
+
+.redText {
+    color: #ff4141;
+}
+
 .tick line {
     stroke:  rgba(255, 255, 255, 0.5);
     stroke-width: 0.3px;
+}
+
+#tooltip {
+    position: fixed;
+    top: 10px;
+    left: 0px;
+    padding: 5px;
+    background-color: rgba(24, 26, 27, 0.75);
+    border: solid 1px rgb(216, 212, 207);
+    display: none;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: sans-serif;
+    font-size: 12px;
 }
 
 .mouseLine {
