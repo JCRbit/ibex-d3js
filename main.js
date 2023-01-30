@@ -67,6 +67,13 @@ function showData(data) {
     showCandles(data, candleWidth)
     showVolume(data, candleWidth) 
     showMouseLines()
+    
+    // Zoom
+    const scaleExtent = [1, 5]
+    const translateExtent = [[0 , 0], [width, netHeight]]
+    const zoom = d3.zoom().scaleExtent(scaleExtent).translateExtent(translateExtent).extent(translateExtent)
+    zoom.on("zoom", zoomed)
+    svg.call(zoom)
 }
 
 function showCandles(data, candleWidth) {
@@ -90,7 +97,7 @@ function showCandles(data, candleWidth) {
         .attr("opacity", 0)
 
     const candleGroups = datesGroup.selectAll("g.date").append("g").attr("class", "candle")
-    // Candlestick wiskers
+    // Candlestick whiskers
     candleGroups.append("line")
         .attr("class", d => d.open > d.close ? "redLine" : "greenLine")
         .attr("x1", d => x(d.date))
@@ -164,4 +171,17 @@ function showTooltip(d, x, y) {
     d3.select("td#change").attr("class", d.open > d.close ? "redText" : "greenText").text(`${(d.close - d.open).toFixed(2)}`)
     d3.select("td#percentageChange").attr("class",  d.open > d.close ? "redText" : "greenText").text(`${((d.close / d.open - 1) * 100).toFixed(2)}%`)
     d3.select("td#volume").text(`€${(d.volume / 10**6).toFixed(2)} M`)
+}
+
+function zoomed() {
+    let newX = d3.event.transform.rescaleX(x)
+    let newY = d3.event.transform.rescaleY(y) 
+
+    xAxis.scale(newX)
+    svg.select("g#xAxisGroup").call(xAxis.tickFormat(d3.timeFormat("%-d %b %Y")))
+
+    yAxis.scale(newY)
+    svg.select("g#yAxisGroup").call(yAxis)
+        
+    datesGroup.attr("transform", d3.event.transform)
 }
